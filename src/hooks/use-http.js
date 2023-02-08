@@ -1,10 +1,16 @@
 import { useCallback, useState } from "react";
 
-const useHttp = (requestConfig, applyData) => {
+const useHttp = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const sendRequest = useCallback(async () => {
+  // useCallback returns a memoized (cached) version of a function 
+  // that only changes if one or more of its dependencies have changed. 
+  // This can help to prevent unnecessary re-renders of components that use this function.
+
+  // In this case, since useEffect in App has dependency of sendRequest, not using useCallback will result in infinite loop
+
+  const sendRequest = useCallback(async (requestConfig, applyData) => {
     setIsLoading(true);
     setError(null);
     try {
@@ -19,13 +25,12 @@ const useHttp = (requestConfig, applyData) => {
       }
       console.log('data fetched')
       const data = await response.json();
-      console.log(data)
       applyData(data);
     } catch (err) {
       setError(err.message || "Something went wrong!");
     }
     setIsLoading(false);
-  },[requestConfig, applyData]);
+  },[]);
 
   return {
     isLoading,
